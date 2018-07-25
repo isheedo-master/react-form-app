@@ -1,16 +1,12 @@
-import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import React from 'react';
+import FormWithValidation from '../Form';
+import Modal from '../Modal';
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <Button>
-          Hi there
-        </Button>
-      </div>
-    );
-  }
-}
+const App = () => (
+  <div>
+    <FormWithValidation />
+    <Modal />
+  </div>
+);
 
 export default App;
