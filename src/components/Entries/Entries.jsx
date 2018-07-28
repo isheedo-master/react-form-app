@@ -1,37 +1,99 @@
-import React from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
+  ListGroup,
+  ListGroupItem,
+  Collapse,
+  CardBody,
+  Card,
 } from 'reactstrap';
+import PropTypes from 'prop-types';
 
+import { ListWrapper, EntriesWrapper } from './styles';
 
-const Entries = ({ history }) => {
-  const onClose = () => {
+class Entries extends Component {
+  state = {};
+
+  onClose = () => {
+    const { history, entries } = this.props;
     history.push({ state: { showModal: null } });
   };
 
-  return (
-    <Modal
-      isOpen
-      size="lg"
-      // toggle={this.toggle}
-    >
-      <ModalHeader>
-        Validated entries
+  onEntryToggle = entryId => {
+    if (this.state[entryId]) {
+      this.setState({
+        [entryId]: !this.state[entryId],
+      });
+    } else {
+      this.setState({
+        [entryId]: true,
+      })
+    }
+  }
+
+  render() {
+    const { entries } = this.props;
+    return (
+      <EntriesWrapper
+        isOpen
+        size="lg"
+        toggle={this.onClose}
+      >
+        <ModalHeader toggle={this.onClose}>
+          Validated entries
       </ModalHeader>
-      <ModalBody>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </ModalBody>
-      <ModalFooter>
-        <Button color="danger" onClick={onClose}>
-          Close
+        <ModalBody>
+          {entries.length > 0 ? (
+            <ListGroup flush>
+              {entries.map(entry => (
+                <ListWrapper key={entry.id}>
+                  <Button
+                    size="sm"
+                    onClick={() => this.onEntryToggle(entry.id)}
+                  >
+                    {this.state[entry.id] ? '-' : '+'}
+                  </Button>{'    '}
+                  {`${entry.name} ${entry.surname}`}
+                  <Collapse
+                    isOpen={this.state[entry.id]}
+                  >
+                    <Card>
+                      <CardBody>
+                        <p><strong>Email: </strong>{entry.email}</p>
+                        <p><strong>Phone: </strong>{entry.phone}</p>
+                        <p><strong>Email: </strong>{entry.email}</p>
+                        <p><strong>Address: </strong>{entry.address}</p>
+                        {entry.zip && (
+                          <Fragment>
+                            <strong>ZIP code: </strong>{entry.zip}
+                          </Fragment>
+                        )}
+                      </CardBody>
+                    </Card>
+                  </Collapse>
+                </ListWrapper>
+              ))}
+            </ListGroup>
+          ) : 'No entries so far, submit some using the main form'}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="danger" onClick={this.onClose}>
+            Close
         </Button>
-      </ModalFooter>
-    </Modal>
-  );
+        </ModalFooter>
+      </EntriesWrapper>
+    );
+  }
 }
 
+Entries.propTypes = {
+  entries: PropTypes.arrayOf(PropTypes.object).isRequired,
+  history: PropTypes.object.isRequired,
+};
+
 export default Entries;
+

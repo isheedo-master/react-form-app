@@ -12,7 +12,7 @@ const AppRouter = () => (
   </Router>
 );
 
-const appElement = document.getElementById('app');
+const appElement = document.getElementById('app'); //eslint-disable-line
 
 ReactDOM.render(
   <Provider store={store}>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
-import { Link } from 'react-router-dom';
 import {
-  Form,
   FormGroup,
   Input,
   Container,
@@ -10,7 +8,11 @@ import {
   Col,
   FormFeedback,
   Button,
+  Card,
+  CardBody,
 } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const validate = (values) => {
   const errors = {};
@@ -36,7 +38,7 @@ const validate = (values) => {
   // NOTE: googled this regex as am not sure about German phone format
   if (!values.phone) {
     errors.phone = 'Phone number is required';
-  } else if (!/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i.test(values.phone)) {
+  } else if (!/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i.test(values.phone)) { //eslint-disable-line
     errors.phone = 'Please enter a valid phone number';
   }
   // ZIP code validation rules
@@ -47,22 +49,23 @@ const validate = (values) => {
   return errors;
 };
 
+/* eslint-disable */
 const renderField = ({
   input,
   label,
   type,
   meta: {
     touched,
-    error
-  }
+    error,
+  },
 }) => (
+  /* eslint-enable */
   <FormGroup>
     <Input
       {...input}
-      bsSize="lg"
       placeholder={label}
       type={type}
-      invalid={touched && error}
+      invalid={touched && Boolean(error)}
     />
     <FormFeedback>
       {error}
@@ -74,56 +77,80 @@ const FormWithValidation = (props) => {
   const {
     pristine,
     invalid,
+    handleSubmit,
+    reset,
+    onSubmit,
   } = props;
   return (
     <Container>
       <Row>
         <Col sm="12" md={{ size: 8, offset: 2 }}>
-          <Form>
-            <Row>
-              <Col>
-                <Field name="name" type="text" component={renderField} label="Name" />
-              </Col>
-              <Col>
-                <Field name="surname" type="text" component={renderField} label="Surname" />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <Field name="email" type="email" component={renderField} label="Email" />
-              </Col>
-              <Col>
-                <Field name="phone" type="text" component={renderField} label="Phone" />
-              </Col>
-              <Col>
-                <Field name="zip" type="text" component={renderField} label="ZIP code" />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <Field name="address" type="textarea" component={renderField} label="Address" />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <Button
-                  block
-                  size="lg"
-                  color="primary"
-                  disabled={pristine || invalid}
-                >
-                  Submit
-                </Button>
-                <Link to={{ state: { showModal: true } }}>
-                  Show entries
-                </Link>
-              </Col>
-            </Row>
-          </Form>
+          <Card className="border-0 shadow p-3 mb-5 bg-white rounded">
+            <CardBody>
+              <form
+                onSubmit={handleSubmit((values) => {
+                  onSubmit(values);
+                  reset();
+                })}
+              >
+                <Row>
+                  <Col sm="12" md="6">
+                    <Field name="name" type="text" component={renderField} label="Name" />
+                  </Col>
+                  <Col sm="12" md="6">
+                    <Field name="surname" type="text" component={renderField} label="Surname" />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm="12" md="4">
+                    <Field name="email" type="email" component={renderField} label="Email" />
+                  </Col>
+                  <Col sm="12" md="4">
+                    <Field name="phone" type="text" component={renderField} label="Phone" />
+                  </Col>
+                  <Col sm="12" md="4">
+                    <Field name="zip" type="text" component={renderField} label="ZIP code" />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Field name="address" type="textarea" component={renderField} label="Address" />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Button
+                      block
+                      size="lg"
+                      color="primary"
+                      disabled={pristine || invalid}
+                    >
+                      Submit
+                    </Button>
+                    <p className="text-right">
+                      <small>
+                        <Link to={{ state: { showModal: true } }}>
+                          Show entries
+                        </Link>
+                      </small>
+                    </p>
+                  </Col>
+                </Row>
+              </form>
+            </CardBody>
+          </Card>
         </Col>
       </Row>
     </Container>
   );
+};
+
+FormWithValidation.propTypes = {
+  pristine: PropTypes.bool.isRequired,
+  invalid: PropTypes.bool.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
 };
 
 export default reduxForm({
